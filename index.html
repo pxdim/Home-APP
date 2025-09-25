@@ -3,137 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>像素維度</title>
-    <meta name="description" content="一個基於真實物理引擎的表情符號發射器，體驗重力、彈性、碰撞等物理效果">
-    <meta name="keywords" content="物理引擎,表情符號,互動,模擬,重力,彈性">
-    <link rel="stylesheet" href="styles.css">
+    <title>像素維度 - 物理表情發射器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        #renderCanvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #0f0;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #0f0;
+            min-width: 200px;
+            z-index: 1000;
+            user-select: none;
+        }
+
+        .hud-title {
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #0f0;
+        }
+
+        .hud-item {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hud-label {
+            color: #080;
+        }
+
+        .hud-value {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .emoji-selector {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border: 1px solid #0f0;
+            z-index: 1000;
+        }
+
+        .emoji-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #080;
+            background: #000;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .emoji-btn:hover,
+        .emoji-btn.active {
+            border-color: #0f0;
+            background: #080;
+            transform: scale(1.1);
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #0f0;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #0f0;
+            z-index: 1000;
+            user-select: none;
+        }
+
+        .control-group {
+            margin: 10px 0;
+        }
+
+        .control-group label {
+            display: block;
+            color: #080;
+            margin-bottom: 3px;
+        }
+
+        .control-group input[type="range"] {
+            width: 150px;
+        }
+
+        .control-value {
+            color: #0f0;
+            float: right;
+        }
+
+        .btn-group {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-btn {
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+
+        .control-btn:hover {
+            background: #080;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #0f0;
+            font-size: 14px;
+            z-index: 2000;
+            text-align: center;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 2px;
+            background: #080;
+            margin: 10px auto;
+            position: relative;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: #0f0;
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #080;
+            font-size: 11px;
+            text-align: center;
+            z-index: 999;
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <canvas id="physicsCanvas"></canvas>
-
-        <div class="controls">
-            <div class="control-panel">
-                <h1>表情符號物理發射器</h1>
-
-                <div class="emoji-selector">
-                    <h3>選擇表情符號</h3>
-                    <div class="emoji-grid">
-                        <button class="emoji-btn" data-emoji="😀">😀</button>
-                        <button class="emoji-btn" data-emoji="🚀">🚀</button>
-                        <button class="emoji-btn" data-emoji="⚽">⚽</button>
-                        <button class="emoji-btn" data-emoji="🎈">🎈</button>
-                        <button class="emoji-btn active" data-emoji="💖">💖</button>
-                        <button class="emoji-btn" data-emoji="⭐">⭐</button>
-                        <button class="emoji-btn" data-emoji="🔥">🔥</button>
-                        <button class="emoji-btn" data-emoji="🌈">🌈</button>
-                        <button class="emoji-btn" data-emoji="🎯">🎯</button>
-                        <button class="emoji-btn" data-emoji="🍕">🍕</button>
-                        <button class="emoji-btn" data-emoji="🦄">🦄</button>
-                        <button class="emoji-btn" data-emoji="💎">💎</button>
-                    </div>
-                </div>
-
-                <div class="physics-controls">
-                    <div class="slider-group">
-                        <label>
-                            <span>重力強度</span>
-                            <input type="range" id="gravity" min="0" max="2" step="0.1" value="0.5">
-                            <span class="value" id="gravityValue">0.5</span>
-                        </label>
-                    </div>
-
-                    <div class="slider-group">
-                        <label>
-                            <span>彈性係數</span>
-                            <input type="range" id="bounce" min="0" max="1" step="0.1" value="0.7">
-                            <span class="value" id="bounceValue">0.7</span>
-                        </label>
-                    </div>
-
-                    <div class="slider-group">
-                        <label>
-                            <span>發射力度</span>
-                            <input type="range" id="power" min="5" max="30" step="1" value="15">
-                            <span class="value" id="powerValue">15</span>
-                        </label>
-                    </div>
-
-                    <div class="slider-group">
-                        <label>
-                            <span>摩擦力</span>
-                            <input type="range" id="friction" min="0.9" max="1" step="0.01" value="0.99">
-                            <span class="value" id="frictionValue">0.99</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="action-buttons">
-                    <button id="clearBtn" class="btn btn-clear">清除全部</button>
-                    <button id="rainBtn" class="btn btn-rain">表情雨</button>
-                    <button id="explosionBtn" class="btn btn-explosion">大爆炸</button>
-                    <button id="gravityBtn" class="btn btn-gravity">切換重力</button>
-                </div>
-
-                <div class="stats">
-                    <div class="stat-item">
-                        <span>表情數量：</span>
-                        <span id="emojiCount">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span>FPS：</span>
-                        <span id="fps">60</span>
-                    </div>
-                </div>
-
-                <div class="instructions">
-                    <h4>操作說明：</h4>
-                    <p>• 點擊並拖動來發射表情符號</p>
-                    <p>• 拖動距離決定發射力度</p>
-                    <p>• 調整物理參數來改變行為</p>
-                </div>
-
-                <div class="keyboard-shortcuts">
-                    <h4>鍵盤快捷鍵：</h4>
-                    <div class="shortcut-grid">
-                        <span><kbd>空白鍵</kbd> 中心發射</span>
-                        <span><kbd>C</kbd> 清除全部</span>
-                        <span><kbd>R</kbd> 表情雨</span>
-                        <span><kbd>E</kbd> 大爆炸</span>
-                        <span><kbd>G</kbd> 切換重力</span>
-                        <span><kbd>Q</kbd> 品質模式</span>
-                        <span><kbd>A</kbd> 自動模式</span>
-                        <span><kbd>1-9</kbd> 選擇表情</span>
-                    </div>
-                </div>
-
-                <div class="about">
-                    <p class="version">v2.0 Enhanced</p>
-                    <p class="tagline">基於真實物理引擎的互動體驗</p>
-                    <p class="easter-egg-hint" title="↑↑↓↓←→←→BA">•</p>
-                </div>
-            </div>
+    <div id="loading" class="loading">
+        <div>INITIALIZING PHYSICS ENGINE</div>
+        <div class="loading-bar">
+            <div class="loading-progress" id="loadingProgress"></div>
         </div>
+        <div>PIXEL DIMENSION</div>
+    </div>
 
-        <div class="launch-indicator" id="launchIndicator">
-            <div class="power-bar">
-                <div class="power-fill"></div>
-            </div>
-            <div class="angle-arrow"></div>
+    <canvas id="renderCanvas"></canvas>
+
+    <div class="hud">
+        <div class="hud-title">SYSTEM STATUS</div>
+        <div class="hud-item">
+            <span class="hud-label">FPS:</span>
+            <span class="hud-value" id="fps">60</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">ENTITIES:</span>
+            <span class="hud-value" id="entityCount">0</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">PHYSICS:</span>
+            <span class="hud-value" id="physicsTime">0ms</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-label">MEMORY:</span>
+            <span class="hud-value" id="memoryUsage">0MB</span>
         </div>
     </div>
 
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="loading-emoji">◆</div>
-            <h2>正在載入物理引擎...</h2>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
-            <p class="loading-tip">提示：試試 Konami Code</p>
+    <div class="controls">
+        <div class="control-group">
+            <label>GRAVITY <span class="control-value" id="gravityValue">9.8</span></label>
+            <input type="range" id="gravityControl" min="0" max="30" value="9.8" step="0.1">
+        </div>
+        <div class="control-group">
+            <label>POWER <span class="control-value" id="powerValue">15</span></label>
+            <input type="range" id="powerControl" min="5" max="50" value="15" step="1">
+        </div>
+        <div class="control-group">
+            <label>BOUNCE <span class="control-value" id="bounceValue">0.6</span></label>
+            <input type="range" id="bounceControl" min="0" max="1" value="0.6" step="0.05">
+        </div>
+        <div class="control-group">
+            <label>FRICTION <span class="control-value" id="frictionValue">0.3</span></label>
+            <input type="range" id="frictionControl" min="0" max="1" value="0.3" step="0.05">
+        </div>
+        <div class="btn-group">
+            <button class="control-btn" id="clearBtn">CLEAR ALL</button>
+            <button class="control-btn" id="explosionBtn">EXPLOSION</button>
+            <button class="control-btn" id="rainBtn">EMOJI RAIN</button>
+            <button class="control-btn" id="zeroGBtn">ZERO-G MODE</button>
         </div>
     </div>
 
-    <script src="physics-engine.js"></script>
+    <div class="emoji-selector">
+        <button class="emoji-btn active" data-emoji="😀">😀</button>
+        <button class="emoji-btn" data-emoji="🚀">🚀</button>
+        <button class="emoji-btn" data-emoji="💎">💎</button>
+        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+        <button class="emoji-btn" data-emoji="⭐">⭐</button>
+        <button class="emoji-btn" data-emoji="💖">💖</button>
+        <button class="emoji-btn" data-emoji="🌟">🌟</button>
+        <button class="emoji-btn" data-emoji="⚡">⚡</button>
+    </div>
+
+    <div class="instructions">
+        HOLD MOUSE TO LAUNCH CONTINUOUSLY
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
