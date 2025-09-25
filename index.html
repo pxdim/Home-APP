@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>像素維度 - 物理表情發射器</title>
+    <title>像素維度 - 2D物理實驗室</title>
     <style>
         * {
             margin: 0;
@@ -15,41 +15,34 @@
             font-family: 'Courier New', monospace;
             background: #000;
             overflow: hidden;
+            user-select: none;
             cursor: crosshair;
         }
 
-        #renderCanvas {
+        #canvas {
+            display: block;
             position: absolute;
-            width: 100%;
-            height: 100%;
+            background: radial-gradient(circle at center, #0a0a0a, #000);
         }
 
+        /* HUD Display */
         .hud {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             color: #0f0;
-            font-size: 12px;
-            font-family: 'Courier New', monospace;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
+            font-size: 11px;
+            background: rgba(0,0,0,0.8);
             border: 1px solid #0f0;
-            min-width: 200px;
-            z-index: 1000;
-            user-select: none;
+            padding: 12px;
+            min-width: 180px;
+            z-index: 100;
         }
 
-        .hud-title {
-            font-size: 14px;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #0f0;
-        }
-
-        .hud-item {
-            margin: 5px 0;
+        .hud-row {
             display: flex;
             justify-content: space-between;
+            margin: 3px 0;
         }
 
         .hud-label {
@@ -61,206 +54,361 @@
             font-weight: bold;
         }
 
-        .emoji-selector {
+        /* Control Panel */
+        .controls {
             position: fixed;
-            bottom: 20px;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #0f0;
+            padding: 12px;
+            color: #0f0;
+            font-size: 11px;
+            z-index: 100;
+            width: 200px;
+        }
+
+        .control-group {
+            margin: 8px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #030;
+        }
+
+        .control-group:last-child {
+            border: none;
+        }
+
+        .slider-container {
+            margin: 5px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            font-size: 10px;
+        }
+
+        .slider-name {
+            color: #080;
+        }
+
+        .slider-value {
+            color: #0f0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 3px;
+            background: #030;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            background: #0f0;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 5px;
+            margin: 3px 0;
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            transition: all 0.1s;
+        }
+
+        .btn:hover {
+            background: #0f0;
+            color: #000;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Emoji Selector */
+        .emoji-bar {
+            position: fixed;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
+            gap: 5px;
+            background: rgba(0,0,0,0.8);
             border: 1px solid #0f0;
-            z-index: 1000;
+            padding: 8px;
+            z-index: 100;
         }
 
         .emoji-btn {
-            width: 40px;
-            height: 40px;
-            border: 1px solid #080;
+            width: 35px;
+            height: 35px;
+            border: 1px solid #030;
             background: #000;
-            color: #fff;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .emoji-btn:hover,
         .emoji-btn.active {
             border-color: #0f0;
-            background: #080;
+            background: #030;
             transform: scale(1.1);
         }
 
-        .controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            color: #0f0;
-            font-size: 12px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border: 1px solid #0f0;
-            z-index: 1000;
-            user-select: none;
-        }
-
-        .control-group {
-            margin: 10px 0;
-        }
-
-        .control-group label {
-            display: block;
-            color: #080;
-            margin-bottom: 3px;
-        }
-
-        .control-group input[type="range"] {
-            width: 150px;
-        }
-
-        .control-value {
-            color: #0f0;
-            float: right;
-        }
-
-        .btn-group {
-            margin-top: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .control-btn {
-            background: #000;
-            border: 1px solid #0f0;
-            color: #0f0;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-        }
-
-        .control-btn:hover {
-            background: #080;
-        }
-
-        .loading {
+        /* Special Mode Indicators */
+        .mode-indicator {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #0f0;
-            font-size: 14px;
-            z-index: 2000;
-            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 0;
+            animation: flash 2s;
+            z-index: 1000;
+            text-shadow: 0 0 20px #0f0;
         }
 
-        .loading-bar {
+        @keyframes flash {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Trajectory Line */
+        .trajectory-preview {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Power Meter */
+        .power-meter {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 200px;
-            height: 2px;
-            background: #080;
-            margin: 10px auto;
-            position: relative;
+            height: 8px;
+            background: #030;
+            border: 1px solid #0f0;
+            display: none;
+            z-index: 100;
         }
 
-        .loading-progress {
+        .power-fill {
             height: 100%;
-            background: #0f0;
-            width: 0;
-            transition: width 0.3s;
+            background: linear-gradient(90deg, #0f0, #ff0, #f00);
+            width: 0%;
+            transition: width 0.1s;
         }
 
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
+        /* Instructions */
         .instructions {
             position: fixed;
-            bottom: 80px;
+            bottom: 100px;
             left: 50%;
             transform: translateX(-50%);
             color: #080;
-            font-size: 11px;
+            font-size: 10px;
             text-align: center;
-            z-index: 999;
+            z-index: 50;
+        }
+
+        /* Combo Counter */
+        .combo-counter {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #0f0;
+            font-size: 20px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            animation: pulse 0.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        /* Secret Menu */
+        .secret-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            border: 2px solid #0f0;
+            padding: 20px;
+            color: #0f0;
+            display: none;
+            z-index: 1000;
+            font-size: 11px;
+        }
+
+        .secret-menu h3 {
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ff0;
+        }
+
+        .secret-menu ul {
+            list-style: none;
+        }
+
+        .secret-menu li {
+            margin: 5px 0;
+        }
+
+        .secret-menu kbd {
+            background: #0f0;
+            color: #000;
+            padding: 2px 5px;
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="loading" class="loading">
-        <div>INITIALIZING PHYSICS ENGINE</div>
-        <div class="loading-bar">
-            <div class="loading-progress" id="loadingProgress"></div>
-        </div>
-        <div>PIXEL DIMENSION</div>
-    </div>
+    <canvas id="canvas"></canvas>
 
-    <canvas id="renderCanvas"></canvas>
-
+    <!-- HUD -->
     <div class="hud">
-        <div class="hud-title">SYSTEM STATUS</div>
-        <div class="hud-item">
+        <div class="hud-row">
             <span class="hud-label">FPS:</span>
             <span class="hud-value" id="fps">60</span>
         </div>
-        <div class="hud-item">
+        <div class="hud-row">
             <span class="hud-label">ENTITIES:</span>
-            <span class="hud-value" id="entityCount">0</span>
+            <span class="hud-value" id="entities">0</span>
         </div>
-        <div class="hud-item">
-            <span class="hud-label">PHYSICS:</span>
-            <span class="hud-value" id="physicsTime">0ms</span>
+        <div class="hud-row">
+            <span class="hud-label">VELOCITY:</span>
+            <span class="hud-value" id="velocity">0</span>
         </div>
-        <div class="hud-item">
-            <span class="hud-label">MEMORY:</span>
-            <span class="hud-value" id="memoryUsage">0MB</span>
+        <div class="hud-row">
+            <span class="hud-label">COMBO:</span>
+            <span class="hud-value" id="combo">0</span>
+        </div>
+        <div class="hud-row">
+            <span class="hud-label">SCORE:</span>
+            <span class="hud-value" id="score">0</span>
         </div>
     </div>
 
+    <!-- Controls -->
     <div class="controls">
         <div class="control-group">
-            <label>GRAVITY <span class="control-value" id="gravityValue">9.8</span></label>
-            <input type="range" id="gravityControl" min="0" max="30" value="9.8" step="0.1">
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span class="slider-name">GRAVITY</span>
+                    <span class="slider-value" id="gravityVal">500</span>
+                </div>
+                <input type="range" id="gravity" min="0" max="2000" value="500">
+            </div>
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span class="slider-name">BOUNCE</span>
+                    <span class="slider-value" id="bounceVal">0.8</span>
+                </div>
+                <input type="range" id="bounce" min="0" max="100" value="80">
+            </div>
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span class="slider-name">FRICTION</span>
+                    <span class="slider-value" id="frictionVal">0.99</span>
+                </div>
+                <input type="range" id="friction" min="90" max="100" value="99">
+            </div>
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span class="slider-name">SIZE</span>
+                    <span class="slider-value" id="sizeVal">30</span>
+                </div>
+                <input type="range" id="size" min="10" max="60" value="30">
+            </div>
         </div>
+
         <div class="control-group">
-            <label>POWER <span class="control-value" id="powerValue">15</span></label>
-            <input type="range" id="powerControl" min="5" max="50" value="15" step="1">
-        </div>
-        <div class="control-group">
-            <label>BOUNCE <span class="control-value" id="bounceValue">0.6</span></label>
-            <input type="range" id="bounceControl" min="0" max="1" value="0.6" step="0.05">
-        </div>
-        <div class="control-group">
-            <label>FRICTION <span class="control-value" id="frictionValue">0.3</span></label>
-            <input type="range" id="frictionControl" min="0" max="1" value="0.3" step="0.05">
-        </div>
-        <div class="btn-group">
-            <button class="control-btn" id="clearBtn">CLEAR ALL</button>
-            <button class="control-btn" id="explosionBtn">EXPLOSION</button>
-            <button class="control-btn" id="rainBtn">EMOJI RAIN</button>
-            <button class="control-btn" id="zeroGBtn">ZERO-G MODE</button>
+            <button class="btn" id="clearBtn">CLEAR [C]</button>
+            <button class="btn" id="pauseBtn">PAUSE [SPACE]</button>
+            <button class="btn" id="gravityBtn">ZERO-G [G]</button>
+            <button class="btn" id="slowmoBtn">SLOW-MO [S]</button>
+            <button class="btn" id="explosionBtn">BIG BANG [B]</button>
+            <button class="btn" id="vortexBtn">VORTEX [V]</button>
+            <button class="btn" id="rainBtn">RAIN [R]</button>
+            <button class="btn" id="blackholeBtn">BLACK HOLE [H]</button>
         </div>
     </div>
 
-    <div class="emoji-selector">
-        <button class="emoji-btn active" data-emoji="😀">😀</button>
-        <button class="emoji-btn" data-emoji="🚀">🚀</button>
-        <button class="emoji-btn" data-emoji="💎">💎</button>
-        <button class="emoji-btn" data-emoji="🔥">🔥</button>
-        <button class="emoji-btn" data-emoji="⭐">⭐</button>
-        <button class="emoji-btn" data-emoji="💖">💖</button>
-        <button class="emoji-btn" data-emoji="🌟">🌟</button>
-        <button class="emoji-btn" data-emoji="⚡">⚡</button>
+    <!-- Emoji Selector -->
+    <div class="emoji-bar">
+        <div class="emoji-btn active" data-emoji="😀">😀</div>
+        <div class="emoji-btn" data-emoji="🚀">🚀</div>
+        <div class="emoji-btn" data-emoji="💎">💎</div>
+        <div class="emoji-btn" data-emoji="🔥">🔥</div>
+        <div class="emoji-btn" data-emoji="⭐">⭐</div>
+        <div class="emoji-btn" data-emoji="💖">💖</div>
+        <div class="emoji-btn" data-emoji="🌈">🌈</div>
+        <div class="emoji-btn" data-emoji="⚡">⚡</div>
+        <div class="emoji-btn" data-emoji="🎯">🎯</div>
+        <div class="emoji-btn" data-emoji="👾">👾</div>
     </div>
 
+    <!-- Power Meter -->
+    <div class="power-meter" id="powerMeter">
+        <div class="power-fill" id="powerFill"></div>
+    </div>
+
+    <!-- Instructions -->
     <div class="instructions">
-        HOLD MOUSE TO LAUNCH CONTINUOUSLY
+        HOLD & DRAG TO AIM • RELEASE TO LAUNCH • PRESS ? FOR HELP
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
-    <script src="app.js"></script>
+    <!-- Combo Counter -->
+    <div class="combo-counter" id="comboCounter">
+        COMBO x<span id="comboNum">0</span>
+    </div>
+
+    <!-- Mode Indicator -->
+    <div class="mode-indicator" id="modeIndicator"></div>
+
+    <!-- Secret Menu -->
+    <div class="secret-menu" id="secretMenu">
+        <h3>SECRET COMMANDS</h3>
+        <ul>
+            <li><kbd>?</kbd> Toggle This Menu</li>
+            <li><kbd>1-0</kbd> Quick Emoji Select</li>
+            <li><kbd>↑↑↓↓←→←→BA</kbd> Konami Code</li>
+            <li><kbd>M</kbd> Matrix Mode</li>
+            <li><kbd>T</kbd> Show Trajectory</li>
+            <li><kbd>F</kbd> Fireworks Mode</li>
+            <li><kbd>D</kbd> Debug Info</li>
+            <li><kbd>X</kbd> Extreme Physics</li>
+            <li><kbd>SHIFT</kbd> Rapid Fire</li>
+        </ul>
+    </div>
+
+    <script src="engine2d.js"></script>
 </body>
 </html>
