@@ -3,245 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>首頁 - 您的專業服務</title>
+    <title>表情符號物理發射器 🚀</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h1>YourBrand</h1>
-            </div>
-            <nav class="nav-menu">
-                <ul>
-                    <li><a href="#home">首頁</a></li>
-                    <li><a href="#about">關於我們</a></li>
-                    <li><a href="#services">服務項目</a></li>
-                    <li><a href="#portfolio">作品集</a></li>
-                    <li><a href="#contact">聯絡我們</a></li>
-                </ul>
-            </nav>
-            <div class="nav-toggle" id="navToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </header>
+    <div id="app">
+        <canvas id="physicsCanvas"></canvas>
 
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">歡迎來到我們的世界</h1>
-            <p class="hero-subtitle">提供最優質的專業服務，創造卓越價值</p>
-            <div class="hero-buttons">
-                <a href="#services" class="btn btn-primary">了解更多</a>
-                <a href="#contact" class="btn btn-secondary">聯絡我們</a>
-            </div>
-        </div>
-        <div class="hero-image">
-            <div class="placeholder-image"></div>
-        </div>
-    </section>
+        <div class="controls">
+            <div class="control-panel">
+                <h1>🎯 表情符號物理發射器</h1>
 
-    <section id="about" class="about">
-        <div class="container">
-            <h2 class="section-title">關於我們</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <h3>專業、創新、值得信賴</h3>
-                    <p>我們是一家致力於提供優質服務的專業團隊。憑藉多年的行業經驗和不斷創新的精神，我們為客戶提供最佳的解決方案。</p>
-                    <p>我們的使命是通過專業的服務和創新的思維，幫助客戶實現他們的目標，創造更大的價值。</p>
+                <div class="emoji-selector">
+                    <h3>選擇表情符號</h3>
+                    <div class="emoji-grid">
+                        <button class="emoji-btn" data-emoji="😀">😀</button>
+                        <button class="emoji-btn" data-emoji="🚀">🚀</button>
+                        <button class="emoji-btn" data-emoji="⚽">⚽</button>
+                        <button class="emoji-btn" data-emoji="🎈">🎈</button>
+                        <button class="emoji-btn active" data-emoji="💖">💖</button>
+                        <button class="emoji-btn" data-emoji="⭐">⭐</button>
+                        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+                        <button class="emoji-btn" data-emoji="🌈">🌈</button>
+                        <button class="emoji-btn" data-emoji="🎯">🎯</button>
+                        <button class="emoji-btn" data-emoji="🍕">🍕</button>
+                        <button class="emoji-btn" data-emoji="🦄">🦄</button>
+                        <button class="emoji-btn" data-emoji="💎">💎</button>
+                    </div>
                 </div>
-                <div class="about-features">
-                    <div class="feature-item">
-                        <div class="feature-icon">✓</div>
-                        <h4>專業團隊</h4>
-                        <p>擁有豐富經驗的專業人才</p>
+
+                <div class="physics-controls">
+                    <div class="slider-group">
+                        <label>
+                            <span>重力強度</span>
+                            <input type="range" id="gravity" min="0" max="2" step="0.1" value="0.5">
+                            <span class="value" id="gravityValue">0.5</span>
+                        </label>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">⚡</div>
-                        <h4>快速響應</h4>
-                        <p>及時回應客戶需求</p>
+
+                    <div class="slider-group">
+                        <label>
+                            <span>彈性係數</span>
+                            <input type="range" id="bounce" min="0" max="1" step="0.1" value="0.7">
+                            <span class="value" id="bounceValue">0.7</span>
+                        </label>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">🎯</div>
-                        <h4>精準服務</h4>
-                        <p>量身定制的解決方案</p>
+
+                    <div class="slider-group">
+                        <label>
+                            <span>發射力度</span>
+                            <input type="range" id="power" min="5" max="30" step="1" value="15">
+                            <span class="value" id="powerValue">15</span>
+                        </label>
                     </div>
+
+                    <div class="slider-group">
+                        <label>
+                            <span>摩擦力</span>
+                            <input type="range" id="friction" min="0.9" max="1" step="0.01" value="0.99">
+                            <span class="value" id="frictionValue">0.99</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="clearBtn" class="btn btn-clear">🗑️ 清除全部</button>
+                    <button id="rainBtn" class="btn btn-rain">🌧️ 表情雨</button>
+                    <button id="explosionBtn" class="btn btn-explosion">💥 大爆炸</button>
+                    <button id="gravityBtn" class="btn btn-gravity">🌍 切換重力</button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span>表情數量：</span>
+                        <span id="emojiCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>FPS：</span>
+                        <span id="fps">60</span>
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <h4>操作說明：</h4>
+                    <p>🖱️ 點擊並拖動來發射表情符號</p>
+                    <p>📏 拖動距離決定發射力度</p>
+                    <p>🎯 調整物理參數來改變行為</p>
                 </div>
             </div>
         </div>
-    </section>
 
-    <section id="services" class="services">
-        <div class="container">
-            <h2 class="section-title">服務項目</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">💼</div>
-                    <h3>商業諮詢</h3>
-                    <p>提供專業的商業策略規劃與執行建議，協助企業成長。</p>
-                    <a href="#" class="service-link">了解更多 →</a>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🎨</div>
-                    <h3>設計服務</h3>
-                    <p>創意設計解決方案，打造獨特的品牌形象。</p>
-                    <a href="#" class="service-link">了解更多 →</a>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">📱</div>
-                    <h3>數位行銷</h3>
-                    <p>全方位的數位行銷策略，提升品牌網路能見度。</p>
-                    <a href="#" class="service-link">了解更多 →</a>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🔧</div>
-                    <h3>技術支援</h3>
-                    <p>專業的技術支援服務，確保系統穩定運行。</p>
-                    <a href="#" class="service-link">了解更多 →</a>
-                </div>
+        <div class="launch-indicator" id="launchIndicator">
+            <div class="power-bar">
+                <div class="power-fill"></div>
             </div>
+            <div class="angle-arrow"></div>
         </div>
-    </section>
+    </div>
 
-    <section id="portfolio" class="portfolio">
-        <div class="container">
-            <h2 class="section-title">作品展示</h2>
-            <div class="portfolio-grid">
-                <div class="portfolio-item">
-                    <div class="portfolio-image"></div>
-                    <div class="portfolio-overlay">
-                        <h4>專案一</h4>
-                        <p>品牌設計</p>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <div class="portfolio-image"></div>
-                    <div class="portfolio-overlay">
-                        <h4>專案二</h4>
-                        <p>網站開發</p>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <div class="portfolio-image"></div>
-                    <div class="portfolio-overlay">
-                        <h4>專案三</h4>
-                        <p>行銷活動</p>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <div class="portfolio-image"></div>
-                    <div class="portfolio-overlay">
-                        <h4>專案四</h4>
-                        <p>應用程式</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">聯絡我們</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h3>取得聯繫</h3>
-                    <div class="info-item">
-                        <span class="info-icon">📍</span>
-                        <div>
-                            <h4>地址</h4>
-                            <p>台北市信義區信義路五段7號</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-icon">📞</span>
-                        <div>
-                            <h4>電話</h4>
-                            <p>(02) 1234-5678</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-icon">✉️</span>
-                        <div>
-                            <h4>電子郵件</h4>
-                            <p>info@yourcompany.com</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-form">
-                    <h3>傳送訊息</h3>
-                    <form>
-                        <div class="form-group">
-                            <input type="text" placeholder="您的姓名" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="電子郵件" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="tel" placeholder="聯絡電話">
-                        </div>
-                        <div class="form-group">
-                            <textarea rows="5" placeholder="訊息內容" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">傳送訊息</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>YourBrand</h3>
-                    <p>致力於提供最優質的服務，創造卓越價值。</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook">f</a>
-                        <a href="#" aria-label="Twitter">t</a>
-                        <a href="#" aria-label="LinkedIn">in</a>
-                        <a href="#" aria-label="Instagram">ig</a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>快速連結</h4>
-                    <ul>
-                        <li><a href="#about">關於我們</a></li>
-                        <li><a href="#services">服務項目</a></li>
-                        <li><a href="#portfolio">作品集</a></li>
-                        <li><a href="#contact">聯絡我們</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>服務項目</h4>
-                    <ul>
-                        <li><a href="#">商業諮詢</a></li>
-                        <li><a href="#">設計服務</a></li>
-                        <li><a href="#">數位行銷</a></li>
-                        <li><a href="#">技術支援</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>訂閱電子報</h4>
-                    <p>獲取最新消息與優惠資訊</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="輸入您的電子郵件">
-                        <button type="submit">訂閱</button>
-                    </form>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 YourBrand. 版權所有。</p>
-                <div class="footer-links">
-                    <a href="#">隱私政策</a>
-                    <a href="#">使用條款</a>
-                    <a href="#">網站地圖</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+    <script src="physics-engine.js"></script>
 </body>
 </html>
