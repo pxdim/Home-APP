@@ -9,11 +9,11 @@ class Particle {
         this.mass = this.size / 40;
         this.rotation = 0;
         this.rotationSpeed = (Math.random() - 0.5) * 0.2;
-        this.lifespan = special ? 2000 : 10000;
+        this.lifespan = special ? 5000 : 30000;  // 延長停留時間
         this.createdAt = Date.now();
         this.special = special;
         this.trail = [];
-        this.maxTrailLength = 10;
+        this.maxTrailLength = 3;  // 減少拖尾長度
         this.glowIntensity = 0;
     }
 
@@ -117,7 +117,7 @@ class Particle {
                 const trailAge = Date.now() - point.time;
                 const trailOpacity = Math.max(0, 1 - (trailAge / 500));
 
-                ctx.globalAlpha = opacity * trailOpacity * 0.2;
+                ctx.globalAlpha = opacity * trailOpacity * 0.1;  // 減少拖尾透明度
                 ctx.font = `${this.size * (0.3 + i / this.trail.length * 0.7)}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -129,8 +129,8 @@ class Particle {
         ctx.rotate(this.rotation);
 
         if (this.glowIntensity > 0 && qualityMode) {
-            ctx.shadowColor = 'rgba(255, 255, 255, ' + this.glowIntensity + ')';
-            ctx.shadowBlur = 20 * this.glowIntensity;
+            ctx.shadowColor = 'rgba(102, 126, 234, ' + (this.glowIntensity * 0.5) + ')';
+            ctx.shadowBlur = 10 * this.glowIntensity;  // 減少發光模糊
         }
 
         ctx.globalAlpha = opacity;
@@ -138,7 +138,7 @@ class Particle {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
-        const scale = 1 + Math.sin(age * 0.002) * 0.05;
+        const scale = 1 + Math.sin(age * 0.001) * 0.02;  // 減少縮放動畫幅度
         ctx.scale(scale, scale);
 
         ctx.fillText(this.emoji, 0, 0);
@@ -655,7 +655,7 @@ class PhysicsEngine {
 
             this.lastFrameTime = now;
 
-            this.ctx.fillStyle = 'rgba(10, 10, 30, 0.15)';
+            this.ctx.fillStyle = 'rgba(10, 10, 30, 0.05)';  // 減少動態模糊
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
             const currentGravity = this.gravityEnabled ? this.gravity : 0;
@@ -673,6 +673,7 @@ class PhysicsEngine {
                 particle.draw(this.ctx, this.qualityMode);
             }
 
+            // 清理超時的粒子
             this.particles = this.particles.filter(p => {
                 const age = Date.now() - p.createdAt;
                 return age < p.lifespan;
