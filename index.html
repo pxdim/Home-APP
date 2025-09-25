@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>表情符號物理發射器 🚀</title>
+    <title>表情符號物理發射器 🚀 | 互動式物理模擬</title>
+    <meta name="description" content="一個基於真實物理引擎的表情符號發射器，體驗重力、彈性、碰撞等物理效果">
+    <meta name="keywords" content="物理引擎,表情符號,互動,模擬,重力,彈性">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -90,6 +92,26 @@
                     <p>📏 拖動距離決定發射力度</p>
                     <p>🎯 調整物理參數來改變行為</p>
                 </div>
+
+                <div class="keyboard-shortcuts">
+                    <h4>鍵盤快捷鍵：</h4>
+                    <div class="shortcut-grid">
+                        <span><kbd>空白鍵</kbd> 中心發射</span>
+                        <span><kbd>C</kbd> 清除全部</span>
+                        <span><kbd>R</kbd> 表情雨</span>
+                        <span><kbd>E</kbd> 大爆炸</span>
+                        <span><kbd>G</kbd> 切換重力</span>
+                        <span><kbd>Q</kbd> 品質模式</span>
+                        <span><kbd>A</kbd> 自動模式</span>
+                        <span><kbd>1-9</kbd> 選擇表情</span>
+                    </div>
+                </div>
+
+                <div class="about">
+                    <p class="version">v2.0 Enhanced</p>
+                    <p class="tagline">基於真實物理引擎的互動體驗</p>
+                    <p class="easter-egg-hint" title="↑↑↓↓←→←→BA">🎮</p>
+                </div>
             </div>
         </div>
 
@@ -98,6 +120,17 @@
                 <div class="power-fill"></div>
             </div>
             <div class="angle-arrow"></div>
+        </div>
+    </div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-emoji">🚀</div>
+            <h2>正在載入物理引擎...</h2>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p class="loading-tip">提示：試試 Konami Code</p>
         </div>
     </div>
 
