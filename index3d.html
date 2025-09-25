@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>像素維度 - 3D物理引擎</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Mono', monospace;
+            overflow: hidden;
+            background: #000;
+            color: #00ff00;
+        }
+
+        #canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+            min-width: 250px;
+        }
+
+        .controls h2 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #00ff00;
+            font-weight: normal;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #222;
+        }
+
+        .control-group:last-child {
+            border-bottom: none;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .control-row label {
+            color: #888;
+        }
+
+        .control-row .value {
+            color: #00ff00;
+        }
+
+        button {
+            background: #000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: monospace;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff00;
+            padding: 10px 15px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .stats span {
+            color: #00ff00;
+            margin-right: 15px;
+        }
+
+        .emoji-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .emoji-btn {
+            background: #000;
+            border: 1px solid #333;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.1s;
+        }
+
+        .emoji-btn:hover,
+        .emoji-btn.active {
+            border-color: #00ff00;
+            background: #111;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #00ff00;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 2px;
+            background: #222;
+            margin: 10px 0;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: #00ff00;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div>INITIALIZING PHYSICS ENGINE</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+        <div>PIXEL DIMENSION v3.0</div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+        <h2>[ PHYSICS CONTROL ]</h2>
+
+        <div class="control-group">
+            <div class="emoji-selector">
+                <button class="emoji-btn active" data-emoji="😀">😀</button>
+                <button class="emoji-btn" data-emoji="🚀">🚀</button>
+                <button class="emoji-btn" data-emoji="⚽">⚽</button>
+                <button class="emoji-btn" data-emoji="💎">💎</button>
+                <button class="emoji-btn" data-emoji="🔥">🔥</button>
+                <button class="emoji-btn" data-emoji="⭐">⭐</button>
+                <button class="emoji-btn" data-emoji="💖">💖</button>
+                <button class="emoji-btn" data-emoji="🎯">🎯</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="control-row">
+                <label>GRAVITY</label>
+                <span class="value" id="gravityValue">9.82</span>
+            </div>
+            <input type="range" id="gravity" min="0" max="30" value="9.82" step="0.1">
+
+            <div class="control-row">
+                <label>LAUNCH POWER</label>
+                <span class="value" id="powerValue">20</span>
+            </div>
+            <input type="range" id="power" min="5" max="50" value="20" step="1">
+
+            <div class="control-row">
+                <label>RESTITUTION</label>
+                <span class="value" id="restitutionValue">0.7</span>
+            </div>
+            <input type="range" id="restitution" min="0" max="1" value="0.7" step="0.05">
+
+            <div class="control-row">
+                <label>FRICTION</label>
+                <span class="value" id="frictionValue">0.4</span>
+            </div>
+            <input type="range" id="friction" min="0" max="1" value="0.4" step="0.05">
+        </div>
+
+        <div class="control-group">
+            <button id="clearBtn">CLEAR ALL</button>
+            <button id="bombBtn">EMOJI BOMB</button>
+            <button id="rainBtn">EMOJI RAIN</button>
+            <button id="zeroGBtn">ZERO GRAVITY</button>
+        </div>
+
+        <div class="control-row">
+            <label>MAX EMOJIS</label>
+            <span class="value">200</span>
+        </div>
+    </div>
+
+    <div class="stats">
+        <span>FPS: <span id="fps">60</span></span>
+        <span>EMOJIS: <span id="emojiCount">0</span></span>
+        <span>PHYSICS: <span id="physicsTime">0</span>ms</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+    <script src="physics3d.js"></script>
+</body>
+</html>
