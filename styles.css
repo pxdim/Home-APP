@@ -436,8 +436,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .loading-emoji {
     font-size: 4rem;
-    animation: rotate 1s linear infinite;
+    animation: rotate 2s linear infinite;
     margin-bottom: 20px;
+    color: #667eea;
+    display: inline-block;
 }
 
 @keyframes rotate {

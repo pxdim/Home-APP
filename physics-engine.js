@@ -306,13 +306,13 @@ class PhysicsEngine {
 
         document.getElementById('rainBtn')?.addEventListener('click', () => {
             this.createRain();
-            this.addSystemMessage('表情雨模式啟動 🌧️');
+            this.addSystemMessage('表情雨模式啟動');
             this.playSound('rain');
         });
 
         document.getElementById('explosionBtn')?.addEventListener('click', () => {
             this.createExplosion();
-            this.addSystemMessage('大爆炸！💥');
+            this.addSystemMessage('大爆炸！');
             this.playSound('explosion');
         });
 
@@ -320,10 +320,10 @@ class PhysicsEngine {
             this.gravityEnabled = !this.gravityEnabled;
             const btn = document.getElementById('gravityBtn');
             if (!this.gravityEnabled) {
-                btn.textContent = '🪐 開啟重力';
-                this.addSystemMessage('進入零重力模式 🚀');
+                btn.textContent = '開啟重力';
+                this.addSystemMessage('進入零重力模式');
             } else {
-                btn.textContent = '🌍 切換重力';
+                btn.textContent = '切換重力';
                 this.addSystemMessage('重力已恢復');
             }
             this.playSound('gravity');
@@ -373,7 +373,7 @@ class PhysicsEngine {
                     this.autoMode = !this.autoMode;
                     if (this.autoMode) {
                         this.startAutoMode();
-                        this.addSystemMessage('自動模式：開啟 🤖');
+                        this.addSystemMessage('自動模式：開啟');
                     } else {
                         this.addSystemMessage('自動模式：關閉');
                     }
@@ -507,7 +507,7 @@ class PhysicsEngine {
     }
 
     activateEasterEgg() {
-        this.addSystemMessage('🎮 Konami Code Activated! 🎮');
+        this.addSystemMessage('Konami Code Activated!');
         const specialEmojis = ['👾', '🎮', '🕹️', '👻', '🤖', '🛸', '🌟', '💫'];
 
         for (let i = 0; i < 100; i++) {
@@ -625,7 +625,7 @@ class PhysicsEngine {
 
     showWelcomeMessage() {
         setTimeout(() => {
-            this.addSystemMessage('歡迎使用表情物理發射器 v2.0');
+            this.addSystemMessage('歡迎來到像素維度');
             setTimeout(() => {
                 this.addSystemMessage('按 H 查看快捷鍵');
             }, 1500);
